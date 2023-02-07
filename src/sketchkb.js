@@ -1,5 +1,5 @@
 /*
-Version: 0.0.1β
+Version: 0.0.2β
 
 License: MIT License
 Copyright: Meziro(https://github.com/Meziro039/)
@@ -23,6 +23,17 @@ class SketchKb {
     async Deploy(PageId) {
         const PageKeys = Object.keys(this.Pages[PageId]);
 
+        // Bind check
+        const Bindable = this.Pages[PageId]["Bind"] ? true : false;
+        if (Bindable) {
+            const UpLayerKey = PageId.slice(0,PageId.lastIndexOf("/") + 1) + "*";
+            if (Object.keys(this.Pages).includes(UpLayerKey)) {
+                await this.Deploy(UpLayerKey);
+            } else {
+                console.warn("Bind data not found.");
+            }
+        };
+
         // Display content processing.
         for (let i = 0;i < PageKeys.length;i++) {
             if (PageKeys[i].match(/^#/)) {
@@ -31,7 +42,6 @@ class SketchKb {
                 const Content = document.getElementById(ElementId) ? true : false;
 
                 if (Content) {
-                    console.log(this.Pages[PageId]);
                     const ContentData = this.Pages[PageId]["#" + ElementId];
                     const ContentKey = Object.keys(ContentData);
                     if (ContentKey.includes("Html")) {
@@ -44,20 +54,25 @@ class SketchKb {
                                 // Path
 
                                 // Cache check.
-                                let CacheData = "";
-                                const CacheCheck = sessionStorage.getItem(CodePath) ? true : false;
-                                if (CacheCheck) {
-                                    CacheData = sessionStorage.getItem(CodePath);
-                                } else {
-                                    try {
-                                        sessionStorage.setItem(CodePath, await (await fetch(CodePath)).text());
-                                        CacheData = sessionStorage.getItem(CodePath);
-                                    } catch (e) {
-                                        CacheData = await (await fetch(CodePath)).text();
+                                let CodeData = "";
+                                const Cacheable = this.Pages[PageId]["Cache"] ? true : false;
+                                if (Cacheable) {
+                                    const CacheCheck = sessionStorage.getItem(CodePath) ? true : false;
+                                    if (CacheCheck) {
+                                        CodeData = sessionStorage.getItem(CodePath);
+                                    } else {
+                                        try {
+                                            sessionStorage.setItem(CodePath, await (await fetch(CodePath)).text());
+                                            CodeData = sessionStorage.getItem(CodePath);
+                                        } catch (e) {
+                                            CodeData = await (await fetch(CodePath)).text();
+                                        };
                                     };
+                                } else {
+                                    CodeData = await (await fetch(CodePath)).text();
                                 };
 
-                                DrawingHtml.push(CacheData);
+                                DrawingHtml.push(CodeData);
                             };
                         };
                     };
@@ -66,20 +81,25 @@ class SketchKb {
                             const Path = ContentData["Css"][j];
 
                             // Cache check.
-                            let CacheData = "";
-                            const CacheCheck = sessionStorage.getItem(Path) ? true : false;
-                            if (CacheCheck) {
-                                CacheData = sessionStorage.getItem(Path);
-                            } else {
-                                try {
-                                    sessionStorage.setItem(Path, await (await fetch(Path)).text());
-                                    CacheData = sessionStorage.getItem(Path);
-                                } catch (e) {
-                                    CacheData = await (await fetch(Path)).text();
+                            let CodeData = "";
+                            const Cacheable = this.Pages[PageId]["Cache"] ? true : false;
+                            if (Cacheable) {
+                                const CacheCheck = sessionStorage.getItem(Path) ? true : false;
+                                if (CacheCheck) {
+                                    CodeData = sessionStorage.getItem(Path);
+                                } else {
+                                    try {
+                                        sessionStorage.setItem(Path, await (await fetch(Path)).text());
+                                        CodeData = sessionStorage.getItem(Path);
+                                    } catch (e) {
+                                        CodeData = await (await fetch(Path)).text();
+                                    };
                                 };
+                            } else {
+                                CodeData = await (await fetch(Path)).text();
                             };
 
-                            DrawingHtml.push("<style>" + CacheData + "</style>");
+                            DrawingHtml.push("<style>" + CodeData + "</style>");
                         };
                     };
                     if (ContentKey.includes("Js")) {
@@ -87,20 +107,25 @@ class SketchKb {
                             const Path = ContentData["Js"][j];
 
                             // Cache check.
-                            let CacheData = "";
-                            const CacheCheck = sessionStorage.getItem(Path) ? true : false;
-                            if (CacheCheck) {
-                                CacheData = sessionStorage.getItem(Path);
-                            } else {
-                                try {
-                                    sessionStorage.setItem(Path, await (await fetch(Path)).text());
-                                    CacheData = sessionStorage.getItem(Path);
-                                } catch (e) {
-                                    CacheData = await (await fetch(Path)).text();
+                            let CodeData = "";
+                            const Cacheable = this.Pages[PageId]["Cache"] ? true : false;
+                            if (Cacheable) {
+                                const CacheCheck = sessionStorage.getItem(Path) ? true : false;
+                                if (CacheCheck) {
+                                    CodeData = sessionStorage.getItem(Path);
+                                } else {
+                                    try {
+                                        sessionStorage.setItem(Path, await (await fetch(Path)).text());
+                                        CodeData = sessionStorage.getItem(Path);
+                                    } catch (e) {
+                                        CodeData = await (await fetch(Path)).text();
+                                    };
                                 };
+                            } else {
+                                CodeData = await (await fetch(Path)).text();
                             };
 
-                            DrawingHtml.push("<script>" + CacheData + "</script>");
+                            DrawingHtml.push("<script>" + CodeData + "</script>");
                         };
                     };
 
@@ -112,46 +137,51 @@ class SketchKb {
                     if (JsCheck != null && JsCheck.length !== 0) {
                         for (let j = 0;j < JsCheck.length;j++) {
                             DrawingHtml = DrawingHtml.replaceAll(JsCheck[j], "");
-                            const NewElement = document.createElement("script");
+                            const NewEle = document.createElement("script");
                             const ScriptSuevey = (new DOMParser()).parseFromString(JsCheck[j], "text/html").scripts[0];
                             if (ScriptSuevey.src != "") {
-                                NewElement.src = ScriptSuevey.src;
+                                NewEle.src = ScriptSuevey.src;
                             };
                             if (ScriptSuevey.type != "") {
-                                NewElement.type = ScriptSuevey.type;
+                                NewEle.type = ScriptSuevey.type;
                             };                            
                             if (ScriptSuevey.crossOrigin != null) {
-                                NewElement.crossOrigin = ScriptSuevey.crossOrigin;
+                                NewEle.crossOrigin = ScriptSuevey.crossOrigin;
                             };                            
                             if (ScriptSuevey.integrity != "") {
-                                NewElement.integrity = ScriptSuevey.integrity;
+                                NewEle.integrity = ScriptSuevey.integrity;
                             };                           
                             if (ScriptSuevey.referrerPolicy != "") {
-                                NewElement.referrerPolicy = ScriptSuevey.referrerPolicy;
+                                NewEle.referrerPolicy = ScriptSuevey.referrerPolicy;
                             };                           
                             if (ScriptSuevey.defer != false) {
-                                NewElement.defer = ScriptSuevey.defer;
+                                NewEle.defer = ScriptSuevey.defer;
                             };                            
                             if (ScriptSuevey.async != false) {
-                                NewElement.async = ScriptSuevey.async;
+                                NewEle.async = ScriptSuevey.async;
                             }; 
                             if (ScriptSuevey.textContent != "") {
-                                NewElement.textContent = ScriptSuevey.textContent;
+                                NewEle.textContent = ScriptSuevey.textContent;
                             };
-                            JsArray.push(NewElement);
+                            JsArray.push(NewEle);
                         };
                     };
 
                     // Drawing
                     document.getElementById(ElementId).innerHTML = DrawingHtml;
+
                     for (let j = 0;j < JsArray.length;j++) {
                         document.getElementById(ElementId).appendChild(JsArray[j]);
                     };
+
+                    // Run run.
+                    try {
+                        this.Pages[PageId].Run();
+                    } catch (e) {};
                 };
             };
         };
     };
 };
 
-console.log("Load: SketchKbJS");
 console.log("%cSTOP!!\nIf you don't know how to use it, don't touch it.","font-size:20px");

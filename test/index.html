@@ -11,9 +11,19 @@
     <h1>Test</h1>
     <button onclick="Skb.Route('/test')">Test Start</button>
     <div id="App"></div>
+    <div id="Hello"></div>
     <script>
         const Skb = new SketchKb({
+            "/*" : {
+                "#App" : {
+                    "Html" : [
+                        "<p>HelloWorld</p>"
+                    ]
+                }
+            },
             "/test" : {
+                "Bind" : true,
+                "Cache" : true,
                 "#App" : {
                     "Html" : [
                         "<h1 id=\"Hello\">Hello World</h1>",
@@ -25,10 +35,15 @@
                     ],
                     "Js" : [
                         "/test/main.js"
-                    ]
-                }
+                    ],
+                },
+                Run : function() {
+                        console.log("Run run!");
+                    }
             }
         });
+
+        console.log(new URL(location.href).pathname);
     </script>
 </body>
 </html>
