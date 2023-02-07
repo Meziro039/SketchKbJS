@@ -4,6 +4,9 @@
 SPA的な何かができるようになる予定。
 
 ## 利用
+```
+https://cdn.jsdelivr.net/gh/meziro039/sketchkbjs/dist/sketchkb.min.js
+```
 ```js
 const Skb = new SketchKb({
     "PagePath" : {
@@ -30,6 +33,7 @@ const Skb = new SketchKb({
 
 ### Hello World
 ```html
+<script src="https://cdn.jsdelivr.net/gh/meziro039/sketchkbjs/dist/sketchkb.min.js"></script>
 <div id="Hello"></div>
 <script>
     const Skb = new SketchKb({
