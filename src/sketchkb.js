@@ -1,6 +1,5 @@
 /*
-Version: 0.0.2β
-
+Version: 0.0.3β / 2023-02-27
 License: MIT License
 Copyright: Meziro(https://github.com/Meziro039/)
 */
@@ -11,7 +10,7 @@ class SketchKb {
     };
 
     Route(PageId, Root) {
-        PageId = Object.keys(this.Pages).includes(PageId) ? PageId : "";
+        console.log(PageId);
         Root = Root ? Root : "";
         history.pushState(null, "", Root + PageId);
         try {
@@ -21,7 +20,20 @@ class SketchKb {
     };
 
     async Deploy(PageId) {
-        const PageKeys = Object.keys(this.Pages[PageId]);
+        // Get Pagekeys
+        let PageKeys = "";
+        try {
+            PageKeys = Object.keys(this.Pages[PageId]);
+        } catch (err) {
+            if (PageId === "/+") {
+                location.href = "/404.html";
+                return null;
+            } else {
+                PageId = PageId.replace(/\/\+$/, "");
+                PageId = (PageId.slice(0,PageId.lastIndexOf("/"))) + "/+";
+                this.Deploy(PageId);
+            };
+        };
 
         // Bind check
         const Bindable = this.Pages[PageId]["Bind"] ? true : false;
@@ -65,11 +77,21 @@ class SketchKb {
                                             sessionStorage.setItem(CodePath, await (await fetch(CodePath)).text());
                                             CodeData = sessionStorage.getItem(CodePath);
                                         } catch (e) {
-                                            CodeData = await (await fetch(CodePath)).text();
+                                            const CodeFetch = await fetch(CodePath);
+                                            if (CodeFetch.ok) {
+                                                CodeData = await CodeFetch.text();
+                                            } else {
+                                                continue;
+                                            };
                                         };
                                     };
                                 } else {
-                                    CodeData = await (await fetch(CodePath)).text();
+                                    const CodeFetch = await fetch(CodePath);
+                                    if (CodeFetch.ok) {
+                                        CodeData = await CodeFetch.text();
+                                    } else {
+                                        continue;
+                                    };
                                 };
 
                                 DrawingHtml.push(CodeData);
@@ -92,11 +114,21 @@ class SketchKb {
                                         sessionStorage.setItem(Path, await (await fetch(Path)).text());
                                         CodeData = sessionStorage.getItem(Path);
                                     } catch (e) {
-                                        CodeData = await (await fetch(Path)).text();
+                                        const CodeFetch = await fetch(Path);
+                                        if (CodeFetch.ok) {
+                                            CodeData = await CodeFetch.text();
+                                        } else {
+                                            continue;
+                                        };
                                     };
                                 };
                             } else {
-                                CodeData = await (await fetch(Path)).text();
+                                const CodeFetch = await fetch(Path);
+                                if (CodeFetch.ok) {
+                                    CodeData = await CodeFetch.text();
+                                } else {
+                                    continue;
+                                };
                             };
 
                             DrawingHtml.push("<style>" + CodeData + "</style>");
@@ -118,11 +150,21 @@ class SketchKb {
                                         sessionStorage.setItem(Path, await (await fetch(Path)).text());
                                         CodeData = sessionStorage.getItem(Path);
                                     } catch (e) {
-                                        CodeData = await (await fetch(Path)).text();
+                                        const CodeFetch = await fetch(Path);
+                                        if (CodeFetch.ok) {
+                                            CodeData = await CodeFetch.text();
+                                        } else {
+                                            continue;
+                                        };
                                     };
                                 };
                             } else {
-                                CodeData = await (await fetch(Path)).text();
+                                const CodeFetch = await fetch(Path);
+                                if (CodeFetch.ok) {
+                                    CodeData = await CodeFetch.text();
+                                } else {
+                                    continue;
+                                };
                             };
 
                             DrawingHtml.push("<script>" + CodeData + "</script>");

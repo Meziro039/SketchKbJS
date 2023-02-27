@@ -1,11 +1,11 @@
 # SketchKbJS / 開発中
 
 ## 概要
-SPA的な何かができるようになる予定。
+最小限の干渉で実装可能なSPAのフレームワーク
 
 ## 利用
-```
-https://cdn.jsdelivr.net/gh/meziro039/sketchkbjs/dist/sketchkb.min.js
+```html
+<script src="https://cdn.jsdelivr.net/gh/meziro039/sketchkbjs/dist/sketchkb.min.js"></script>
 ```
 ```js
 const Skb = new SketchKb({
@@ -40,13 +40,25 @@ const Skb = new SketchKb({
         "/" : {
             "#Hello" : {
                 "Html" : [
-                    "Hello"
+                    "Hello World"
                 ]
             }
         }
     });
     Skb.Route("/");
 </script>
+```
+
+### aタグの動作停止例
+aタグの動作をキャンセルして、SPAを機能させます。`<button>`ではなく`<a>`を使うことでクローラーなどに良い影響を与えます。
+```js
+// "anchor"を<a>にクラス指定する
+const elementsCancelAnchor = document.getElementsByClassName("anchor");
+for (let i = 0;i < elementsCancelAnchor.length;i++) {
+    elementsCancelAnchor[i].addEventListener("click", function(element){
+        element.preventDefault();
+    }, false);
+};
 ```
 
 ## 更新履歴
@@ -69,6 +81,19 @@ Release: 2023/02/07
 <!--
 上位コンポーネントと同一IDを下位コンポーネントで設定すると上位コンポーネントのデータが消えるのは仕様。
 -->
+
+### Ver0.0.3β
+Release: 2023/02/
+- エラースキップ機能を追加
+- コンポーネント機能を強化
+<!--
+下位コンポーネントが存在しない場合に上位コンポーネントに`/+`のように設定されたものがある場合それを読み込むというもの。なお`/`のようなものは読み込まれずエラーになる。`/*`同位,下位コンポーネントからのBind。`/+`指定された同位,下位コンポーネントが存在しない場合に読み込まれる。
+-->
+
+---
+
+### 予定
+- リファクタリング
 
 <!--
 PageNameには*が使えます。これはそれに続くすべてのパスに対して適応されるもので`hoge/*`とした場合`hoge/fuga`などに適応されます。なお、`hoge/fuga`を設定している場合はそちらが優先されます。なお、`Bind`を`true`にしている場合は`hoge/*`の内容が読み込まれた後に`goge/fuga`が読み込まれます。`*`としてすべてに共通のデータを読み込ませることも可能です。
